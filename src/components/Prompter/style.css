@@ -1,0 +1,11 @@
+.prompter {
+  padding: 3rem;
+
+  font-size: 6vw;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.prompter__script--read {
+  color: #48d978;
+}
