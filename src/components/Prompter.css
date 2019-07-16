@@ -1,0 +1,46 @@
+:root {
+  --color-1: #000000;
+  --color-2: #ffffff;
+}
+
+.prompter {
+  display: flex;
+  padding: 3rem;
+
+  font-size: 6vw;
+  font-weight: 600;
+  line-height: 1.35;
+
+  background-color: var(--color-2);
+}
+
+.prompter__control-wrapper {
+  width: 10%;
+
+  flex-shrink: 0;
+}
+
+.prompter__controls {
+  top: 3rem;
+  position: sticky;
+}
+
+.prompter__unread-script {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--color-1);
+}
+
+.prompter__read-script {
+  color: var(--color-1);
+}
+
+.prompter__button {
+  display: block;
+  padding: 1rem;
+
+  font-size: 1.5rem;
+  color: var(--color-2);
+
+  background-color: var(--color-1);
+  border: 0;
+}

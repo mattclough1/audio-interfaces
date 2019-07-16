@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import SpeechContext from './contexts/SpeechContext';
-import Prompter from './components/Prompter/';
+import Prompter from './components/Prompter';
+import Cue from './components/Cue';
 import MockVoiceInput from './components/MockVoiceInput';
 
-const Cue = ({ children }) => {
-  return <span>children</span>;
-};
-
 function changeColor(bgColor, textColor) {
-  document.body.style.backgroundColor = bgColor;
-  document.body.style.color = textColor;
+  const root = document.documentElement;
+  root.style.setProperty('--color-1', textColor);
+  root.style.setProperty('--color-2', bgColor);
 }
 
 function App() {
@@ -28,10 +26,10 @@ function App() {
             color
           </Cue>
           . In fact, let's make this speech a bit longer and do some more things later on. But first
-          let's describe some tech things, and once we're done with that, we'll change the
+          let's describe some tech things, and once we're done with that, we can change the
           background color <Cue callback={() => changeColor('#fbeaeb', '#2f3c7e')}>again</Cue>
         </Prompter>
-        <MockVoiceInput />
+        {/* <MockVoiceInput /> */}
       </SpeechContext.Provider>
     </div>
   );
