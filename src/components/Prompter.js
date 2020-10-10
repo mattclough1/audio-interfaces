@@ -1,21 +1,16 @@
-/* global window */
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import SpeechContext from '../contexts/SpeechContext';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import './Prompter.css';
+import useSpeechRecognition from '../hooks/useSpeechRecognition';
+import SpeechRecognitionContext from '../contexts/SpeechRecognitionContext';
 
-// Setting Speech API values for webkit
-let { SpeechRecognition, SpeechGrammarList } = window;
-if (!SpeechRecognition && window.webkitSpeechRecognition) {
-  SpeechRecognition = window.webkitSpeechRecognition;
-}
-if (!SpeechGrammarList && window.webkitSpeechGrammarList) {
-  SpeechGrammarList = window.webkitSpeechGrammarList;
-}
+const removePunc = (string) => string.replace(/[,.]/, '');
 
 const Prompter = ({ children }) => {
-  const [speechTranscript, setSpeechTranscript] = useState('');
+  // const { recognition, setTranscript, transcript, grammarList } = useSpeechRecognition();
   // Comment the above line and uncomment the below line for mocking voice input
-  // const { speechTranscript, setSpeechTranscript } = useContext(SpeechContext);
+  const { recognition, setTranscript, transcript, grammarList } = useContext(
+    SpeechRecognitionContext,
+  );
 
   // Current read cursor, starting at 0 obviously
   const [cursor, setCursor] = useState(0);
@@ -27,28 +22,17 @@ const Prompter = ({ children }) => {
     .filter((item) => (typeof item === 'string' && item.length > 0) || item);
 
   // Add words to grammar list
-  const speechGrammarList = new SpeechGrammarList();
   script.forEach((item) => {
     if (typeof item === 'string') {
-      speechGrammarList.addFromString(item.replace(/[.,]/, ''), 1);
+      grammarList.addFromString(item.replace(/[.,]/, ''), 1);
     } else if (React.isValidElement(item)) {
-      speechGrammarList.addFromString(item.props.children.replace(/[,.]/, ''), 1);
+      grammarList.addFromString(removePunc(item.props.children), 1);
     }
   });
 
-  // Create a new SpeechRecognition context
-  const speech = new SpeechRecognition({ grammars: speechGrammarList });
-  // Set our transcript in the state
-  speech.addEventListener('result', (e) => {
-    setSpeechTranscript(e.results[0][0].transcript);
-  });
-  // Keep listening
-  speech.addEventListener('end', (e) => {
-    speech.start();
-  });
   // Whenever the speech transcript updates, let's analyze it and see if we hit any words in the script
   useEffect(() => {
-    speechTranscript.split(' ').forEach((spokenWord) => {
+    transcript.split(' ').forEach((spokenWord) => {
       // Get the word in the script at our current cursor point
       let scriptWord = script[cursor];
       if (scriptWord) {
@@ -59,8 +43,8 @@ const Prompter = ({ children }) => {
         // If the spoken word matches our script word, remove the word from our speech transcript and move the cursor
         // which will cause useEffect to run again and analyze the next word
         // I'm 90% sure this can be done in an easier way
-        if (spokenWord.toLowerCase() === scriptWord.replace(/[.,]/, '').toLowerCase()) {
-          setSpeechTranscript((oldTranscript) =>
+        if (spokenWord.toLowerCase() === removePunc(scriptWord).toLowerCase()) {
+          setTranscript((oldTranscript) =>
             oldTranscript
               .split(' ')
               .slice(1)
@@ -109,7 +93,7 @@ const Prompter = ({ children }) => {
             className="prompter__button"
             type="button"
             onClick={() => {
-              speech.start();
+              recognition.start();
             }}
           >
             Start Listening

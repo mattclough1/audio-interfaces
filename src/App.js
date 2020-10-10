@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import SpeechContext from './contexts/SpeechContext';
+import { SpeechRecognitionProvider } from './contexts/SpeechRecognitionContext';
 import Prompter from './components/Prompter';
 import Cue from './components/Cue';
 import MockVoiceInput from './components/MockVoiceInput';
@@ -11,11 +11,9 @@ function changeColor(bgColor, textColor) {
 }
 
 function App() {
-  const [speechTranscript, setSpeechTranscript] = useState('');
-
   return (
     <div className="App">
-      <SpeechContext.Provider value={{ speechTranscript, setSpeechTranscript }}>
+      <SpeechRecognitionProvider>
         <Prompter>
           This is a test. Let's change the background
           <Cue
@@ -29,8 +27,8 @@ function App() {
           let's describe some tech things, and once we're done with that, we can change the
           background color <Cue callback={() => changeColor('#fbeaeb', '#2f3c7e')}>again</Cue>
         </Prompter>
-        {/* <MockVoiceInput /> */}
-      </SpeechContext.Provider>
+        <MockVoiceInput />
+      </SpeechRecognitionProvider>
     </div>
   );
 }

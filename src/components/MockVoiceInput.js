@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
-import SpeechContext from '../contexts/SpeechContext';
+import SpeechRecognitionContext from '../contexts/SpeechRecognitionContext';
 
 let timer = null;
 
 const MockVoiceInput = () => {
-  const { setSpeechTranscript } = useContext(SpeechContext);
+  const { setTranscript } = useContext(SpeechRecognitionContext);
 
   return (
     <input
@@ -17,7 +17,7 @@ const MockVoiceInput = () => {
           timer = null;
         }
         timer = setTimeout(() => {
-          setSpeechTranscript(target.value);
+          setTranscript(target.value);
           target.value = '';
         }, 500);
       }}
