@@ -6,18 +6,30 @@ import SpeechRecognitionContext from '../contexts/SpeechRecognitionContext';
 const removePunc = (string) => string.replace(/[,.]/, '');
 
 const Prompter = ({ children }) => {
-  // const { recognition, setTranscript, transcript, grammarList } = useSpeechRecognition();
+  const { setTranscript, start, stop, transcript, grammarList } = useSpeechRecognition();
   // Comment the above line and uncomment the below line for mocking voice input
-  const { recognition, setTranscript, transcript, grammarList } = useContext(
-    SpeechRecognitionContext,
-  );
+  // const { recognition, setTranscript, transcript, grammarList } = useContext(
+  //   SpeechRecognitionContext,
+  // );
 
   // Current read cursor, starting at 0 obviously
   const [cursor, setCursor] = useState(0);
 
+  const [listening, setListening] = useState(false);
+
+  const handleListenClick = () => {
+    if (listening) {
+      stop();
+      setListening(false);
+    } else {
+      start();
+      setListening(true);
+    }
+  };
+
   // Split all the children into an array of one word or react element per item
   const script = children
-    .map((item) => (typeof item === 'string' ? item.split(' ') : item))
+    .map((item) => (typeof item === 'string' ? item.split(' ').map((w) => removePunc(w)) : item))
     .flat()
     .filter((item) => (typeof item === 'string' && item.length > 0) || item);
 
@@ -43,7 +55,7 @@ const Prompter = ({ children }) => {
         // If the spoken word matches our script word, remove the word from our speech transcript and move the cursor
         // which will cause useEffect to run again and analyze the next word
         // I'm 90% sure this can be done in an easier way
-        if (spokenWord.toLowerCase() === removePunc(scriptWord).toLowerCase()) {
+        if (spokenWord.toLowerCase() === scriptWord.toLowerCase()) {
           setTranscript((oldTranscript) =>
             oldTranscript
               .split(' ')
@@ -76,6 +88,13 @@ const Prompter = ({ children }) => {
 
   return (
     <div className="prompter">
+      <div className="prompter__control-wrapper">
+        <div className="prompter__controls">
+          <button className="prompter__button" type="button" onClick={handleListenClick}>
+            {listening ? 'Stop' : 'Start'} Listening
+          </button>
+        </div>
+      </div>
       <div className="prompter__script">
         <span className="prompter__read-script" ref={readElement}>
           {/* Need to multiply the cursor by 2 to account for the spaces we added */}
@@ -86,19 +105,6 @@ const Prompter = ({ children }) => {
             .slice(cursor * 2)
             .map((item) => (React.isValidElement(item) ? item.props.children : item))}
         </span>
-      </div>
-      <div className="prompter__control-wrapper">
-        <div className="prompter__controls">
-          <button
-            className="prompter__button"
-            type="button"
-            onClick={() => {
-              recognition.start();
-            }}
-          >
-            Start Listening
-          </button>
-        </div>
       </div>
     </div>
   );

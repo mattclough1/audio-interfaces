@@ -27,7 +27,7 @@ function App() {
           let's describe some tech things, and once we're done with that, we can change the
           background color <Cue callback={() => changeColor('#fbeaeb', '#2f3c7e')}>again</Cue>
         </Prompter>
-        <MockVoiceInput />
+        {/* <MockVoiceInput /> */}
       </SpeechRecognitionProvider>
     </div>
   );

@@ -4,25 +4,30 @@
 }
 
 .prompter {
-  display: flex;
+  display: block;
   padding: 3rem;
 
-  font-size: 6vw;
+  font-size: 3rem;
   font-weight: 600;
   line-height: 1.35;
 
   background-color: var(--color-2);
 }
 
-.prompter__control-wrapper {
-  width: 10%;
-
-  flex-shrink: 0;
+@media (min-width: 800px) {
+  .prompter {
+    font-size: 6vw;
+  }
 }
 
-.prompter__controls {
+
+.prompter__control-wrapper {
   top: 3rem;
   position: sticky;
+}
+
+.prompter__script {
+  margin-top: 2rem;
 }
 
 .prompter__unread-script {
