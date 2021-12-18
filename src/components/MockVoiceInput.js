@@ -1,9 +1,10 @@
 import React, { useContext } from 'react';
-import SpeechRecognitionContext from '../contexts/SpeechRecognitionContext';
+
+import { SpeechRecognitionContext } from '../contexts/SpeechRecognitionContext';
 
 let timer = null;
 
-const MockVoiceInput = () => {
+export const MockVoiceInput = () => {
   const { setTranscript } = useContext(SpeechRecognitionContext);
 
   return (
@@ -24,5 +25,3 @@ const MockVoiceInput = () => {
     />
   );
 };
-
-export default MockVoiceInput;

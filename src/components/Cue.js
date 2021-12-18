@@ -1,7 +1,7 @@
-import React from 'react';
 import { func, node } from 'prop-types';
+import React from 'react';
 
-const Cue = ({ children, callback }) => {
+export const Cue = ({ children, callback }) => {
   callback();
   return <span>{children}</span>;
 };
@@ -14,5 +14,3 @@ Cue.propTypes = {
 Cue.defaultProps = {
   children: undefined,
 };
-
-export default Cue;

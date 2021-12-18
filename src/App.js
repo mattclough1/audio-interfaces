@@ -1,6 +1,7 @@
+/* eslint-disable */
 import React, { useState } from 'react';
 import { SpeechRecognitionProvider } from './contexts/SpeechRecognitionContext';
-import Prompter from './components/Prompter';
+import { Prompter } from './components/Prompter';
 import Cue from './components/Cue';
 import MockVoiceInput from './components/MockVoiceInput';
 
@@ -15,17 +16,12 @@ function App() {
     <div className="App">
       <SpeechRecognitionProvider>
         <Prompter>
-          This is a test. Let's change the background
-          <Cue
-            callback={() => {
-              changeColor('#fce77d', '#f96167');
-            }}
-          >
-            color
-          </Cue>
-          . In fact, let's make this speech a bit longer and do some more things later on. But first
-          let's describe some tech things, and once we're done with that, we can change the
-          background color <Cue callback={() => changeColor('#fbeaeb', '#2f3c7e')}>again</Cue>
+          After sleeping through a hundred million centuries we have finally opened our eyes on a
+          sumptuous planet, sparkling with color, bountiful with life. Within decades we must close
+          our eyes again. Isn’t it a noble, an enlightened way of spending our brief time in the
+          sun, to work at understanding the universe and how we have come to wake up in it? This is
+          how I answer when I am asked—as I am surprisingly often—why I bother to get up in the
+          mornings.
         </Prompter>
         {/* <MockVoiceInput /> */}
       </SpeechRecognitionProvider>

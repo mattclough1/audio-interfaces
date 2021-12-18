@@ -1,11 +1,24 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
 import './Prompter.css';
-import useSpeechRecognition from '../hooks/useSpeechRecognition';
-import SpeechRecognitionContext from '../contexts/SpeechRecognitionContext';
 
-const removePunc = (string) => string.replace(/[,.]/, '');
+import React, { useContext, useEffect, useRef, useState } from 'react';
 
-const Prompter = ({ children }) => {
+import { SpeechRecognitionContext } from '../contexts/SpeechRecognitionContext';
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
+
+const removePunc = (string) =>
+  string
+    .replace(/[,.?!\-–—]/, '')
+    .replace(/[\u2018\u2019\u201C\u201D]/g, (c) =>
+      '\'\'""'.substr('\u2018\u2019\u201C\u201D'.indexOf(c), 1),
+    );
+const removeSpacesBetweenPunc = (words) =>
+  words.filter((word, ix) => !(word === ' ' && /^[,.?!\-–—]$/.test(words[ix + 1])));
+
+type PrompterProps = {
+  children?: [React.ReactNode] | string;
+};
+
+export const Prompter = ({ children }: PrompterProps) => {
   const { setTranscript, start, stop, transcript, grammarList } = useSpeechRecognition();
   // Comment the above line and uncomment the below line for mocking voice input
   // const { recognition, setTranscript, transcript, grammarList } = useContext(
@@ -28,10 +41,18 @@ const Prompter = ({ children }) => {
   };
 
   // Split all the children into an array of one word or react element per item
-  const script = children
-    .map((item) => (typeof item === 'string' ? item.split(' ').map((w) => removePunc(w)) : item))
-    .flat()
-    .filter((item) => (typeof item === 'string' && item.length > 0) || item);
+  let script;
+
+  if (typeof children === 'string') {
+    script = children.split(' ');
+  }
+
+  if (Array.isArray(children)) {
+    script = children
+      .map((item) => (typeof item === 'string' ? item.split(' ') : item))
+      .flat()
+      .filter((item) => (typeof item === 'string' && item.length > 0) || item);
+  }
 
   // Add words to grammar list
   script.forEach((item) => {
@@ -47,28 +68,27 @@ const Prompter = ({ children }) => {
     transcript.split(' ').forEach((spokenWord) => {
       // Get the word in the script at our current cursor point
       let scriptWord = script[cursor];
+
       if (scriptWord) {
         // If the word in the script is in a Cue, set the scriptWord to the Cue's children
         if (React.isValidElement(scriptWord)) {
-          scriptWord = scriptWord.props.children;
+          scriptWord = removePunc(scriptWord.props.children);
         }
         // If the spoken word matches our script word, remove the word from our speech transcript and move the cursor
         // which will cause useEffect to run again and analyze the next word
         // I'm 90% sure this can be done in an easier way
-        if (spokenWord.toLowerCase() === scriptWord.toLowerCase()) {
-          setTranscript((oldTranscript) =>
-            oldTranscript
-              .split(' ')
-              .slice(1)
-              .join(' '),
-          );
+        console.log(spokenWord.toLowerCase(), removePunc(scriptWord.toLowerCase()));
+        if (spokenWord.toLowerCase() === removePunc(scriptWord.toLowerCase())) {
+          setTranscript((oldTranscript) => oldTranscript.split(' ').slice(1).join(' '));
           setCursor((currentCursor) => currentCursor + 1);
         }
       }
     });
   });
   // Add spaces to our script array so we can keep our Cues but also render spaces between words
-  const renderedScript = script.map((item, ix) => (ix !== 0 ? [' ', item] : item)).flat();
+  const renderedScript = removeSpacesBetweenPunc(
+    script.map((item, ix) => (ix !== 0 ? [' ', item] : item)).flat(),
+  );
 
   // Scroll the cursor point to the middle of the window as we progress
   const readElement = useRef(null);
@@ -109,5 +129,3 @@ const Prompter = ({ children }) => {
     </div>
   );
 };
-
-export default Prompter;

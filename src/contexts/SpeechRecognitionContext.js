@@ -1,9 +1,9 @@
-import React, { createContext } from 'react';
 import { node } from 'prop-types';
+import React, { createContext } from 'react';
 
-import useSpeechRecognition from '../hooks/useSpeechRecognition';
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 
-const SpeechRecognitionContext = createContext({
+export const SpeechRecognitionContext = createContext({
   speechTranscript: '',
   setSpeechTranscript: () => {},
 });
@@ -27,5 +27,3 @@ SpeechRecognitionProvider.propTypes = {
 SpeechRecognitionProvider.defaultProps = {
   children: undefined,
 };
-
-export default SpeechRecognitionContext;
