@@ -20,6 +20,11 @@ export const useSpeechRecognition = ({ continuous = true } = {}) => {
     recognition.current.continuous = true;
     recognition.current.interimResults = true;
     recognition.current.addEventListener('result', (e) => {
+      console.log(
+        Array.from(e.results)
+          .map((result) => result[0].transcript)
+          .join(''),
+      );
       setTranscript(
         Array.from(e.results)
           .map((result) => result[0].transcript)

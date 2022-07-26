@@ -22,10 +22,14 @@ export const PrompterDemo = () => {
         the <Cue callback={() => changeColor('#fbeaeb', '#2f3c7e')}>color</Cue> to make it look a
         little more interesting. But it&apos;s not limited to color changes. After you read{' '}
         <Cue callback={() => setLinkShowing(true)}>this</Cue>, a link will appear at the top of the
-        screen for a companion app. Click the link and keep reading. Using a broadcast channel,
-        we&apos;re sending messages to the other window. Now we&apos;re controlling this window with
-        our voice. We can look up the weather in{' '}
-        <Cue callback={() => broadcastChannel.current.postMessage('weather')}>London</Cue>
+        screen. Click the link and keep reading while watching for changes in the new window. Using
+        a <Cue callback={() => broadcastChannel.current.postMessage('📡')}>broadcast</Cue> channel,
+        we&apos;re now sending{' '}
+        <Cue callback={() => broadcastChannel.current.postMessage('💌')}>messages</Cue> to the other
+        window using our voice. We can look up the weather in{' '}
+        <Cue callback={() => broadcastChannel.current.postMessage('weather')}>London</Cue>, show a
+        funny <Cue callback={() => broadcastChannel.current.postMessage('gif')}>picture</Cue>, or do
+        anything that code can do!
       </Prompter>
       {/* <MockVoiceInput /> */}
     </SpeechRecognitionProvider>

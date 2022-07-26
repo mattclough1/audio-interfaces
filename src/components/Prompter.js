@@ -20,6 +20,8 @@ const removeSpacesBetweenPunc = (words) =>
       !(word === ' ' && (/^[,.?!\-–—]$/.test(words[ix + 1]) || /[—]$/.test(words[ix - 1]))),
   );
 
+const SPLIT_REGEX = /(\s)?[\w.!?,'"]+(\s|$)/g;
+
 export const Prompter = ({ children, linkShowing }) => {
   const { setTranscript, start, stop, transcript, grammarList } = useSpeechRecognition();
   // Comment the above line and uncomment the below line for mocking voice input
@@ -44,14 +46,38 @@ export const Prompter = ({ children, linkShowing }) => {
   // Split all the children into an array of one word or react element per item
   const script = useMemo(() => {
     if (typeof children === 'string') {
-      return children.match(/[^\s—]+—?/g);
+      return children.match(SPLIT_REGEX);
     }
 
     if (Array.isArray(children)) {
-      return children
-        .map((item) => (typeof item === 'string' ? item.match(/[^\s—]+—?/g) : item))
+      const splitWords = children
+        .map((item) => (typeof item === 'string' ? item.match(SPLIT_REGEX) : item)) // split strings into individual words with trailing spaces
         .flat()
-        .filter((item) => (typeof item === 'string' && item.length > 0) || item);
+        .map((word) => (word === null ? ' ' : word)) // transform null items into spaces
+        .map((word, index, array) => {
+          // append independent spaces to previous words
+          if (array[index + 1] === ' ') {
+            if (React.isValidElement(word)) {
+              return React.cloneElement(word, null, word.props.children.concat(' '));
+            }
+            return word.concat(' ');
+          }
+          return word;
+        })
+        .filter((word) => word !== ' ') // filter out remaining independent spaces
+        .map((word, index, array) => {
+          // append independent punctuation to words
+          const nextWord = array[index + 1];
+          if (/^(?!.*\w)[.,;!?\s]/.test(nextWord)) {
+            if (React.isValidElement(word)) {
+              return React.cloneElement(word, null, word.props.children.concat(nextWord));
+            }
+            return word.concat(nextWord);
+          }
+          return word;
+        })
+        .filter((word) => !/^(?!.*\w)[.,;!?\s]/.test(word)); // filter out remaining independent punctuation
+      return splitWords;
     }
   }, [children]);
 
@@ -59,42 +85,48 @@ export const Prompter = ({ children, linkShowing }) => {
     // Add words to grammar list
     script.forEach((item) => {
       if (typeof item === 'string') {
-        grammarList.addFromString(item.replace(/[.,—]/, ''), 1);
+        grammarList.addFromString(item.replace(/[.,—]/, '').trim(), 1);
       } else if (React.isValidElement(item)) {
-        grammarList.addFromString(removePunc(item.props.children), 1);
+        grammarList.addFromString(removePunc(item.props.children.replace(/[.,—]/, '').trim()), 1);
       }
     });
   }, [grammarList, script]);
 
   // Whenever the speech transcript updates, let's analyze it and see if we hit any words in the script
   useEffect(() => {
-    transcript
-      .split(/[\s—]/)
-      .slice(cursor)
-      .forEach((spokenWord) => {
-        // Get the word in the script at our current cursor point
-        let scriptWord = script[cursor];
+    if (transcript) {
+      transcript
+        // .match(/[\w.!?,;'":]+(\s|$)/g)
+        .split(' ')
+        .slice(cursor)
+        .forEach((spokenWord) => {
+          // Get the word in the script at our current cursor point
+          let scriptWord = script[cursor];
 
-        if (scriptWord) {
-          // If the word in the script is in a Cue, set the scriptWord to the Cue's children
-          if (React.isValidElement(scriptWord)) {
-            scriptWord = removePunc(scriptWord.props.children);
+          if (scriptWord) {
+            // If the word in the script is in a Cue, set the scriptWord to the Cue's children
+            if (React.isValidElement(scriptWord)) {
+              scriptWord = removePunc(scriptWord.props.children);
+            }
+
+            // If the spoken word matches our script word, remove the word from our speech transcript and move the cursor
+            // which will cause useEffect to run again and analyze the next word
+            // I'm 90% sure this can be done in an easier way
+            if (spokenWord.toLowerCase() === removePunc(scriptWord.toLowerCase().trim())) {
+              setTranscript((oldTranscript) => oldTranscript.split(' ').slice(1).join(' '));
+              setCursor((currentCursor) => currentCursor + 1);
+            }
           }
-          // If the spoken word matches our script word, remove the word from our speech transcript and move the cursor
-          // which will cause useEffect to run again and analyze the next word
-          // I'm 90% sure this can be done in an easier way
-          if (spokenWord.toLowerCase() === removePunc(scriptWord.toLowerCase())) {
-            setTranscript((oldTranscript) => oldTranscript.split(' ').slice(1).join(' '));
-            setCursor((currentCursor) => currentCursor + 1);
-          }
-        }
-      });
+        });
+    }
   }, [cursor, script, setTranscript, transcript]);
+
   // Add spaces to our script array so we can keep our Cues but also render spaces between words
-  const renderedScript = useMemo(
-    () => removeSpacesBetweenPunc(script.map((item, ix) => (ix !== 0 ? [' ', item] : item)).flat()),
-    [script],
-  );
+  // const renderedScript = useMemo(
+  //   () => script,
+  //   // () => removeSpacesBetweenPunc(script.map((item, ix) => (ix !== 0 ? [' ', item] : item)).flat()),
+  //   [script],
+  // );
 
   // Scroll the cursor point to the middle of the window as we progress
   const readElement = useRef(null);
@@ -138,12 +170,11 @@ export const Prompter = ({ children, linkShowing }) => {
       </div>
       <div className="prompter__script">
         <span className="prompter__read-script" ref={readElement}>
-          {/* Need to multiply the cursor by 2 to account for the spaces we added */}
-          {renderedScript.slice(0, cursor * 2)}
+          {script.slice(0, cursor)}
         </span>{' '}
         <span className="prompter__unread-script">
-          {renderedScript
-            .slice(cursor * 2)
+          {script
+            .slice(cursor)
             .map((item) => (React.isValidElement(item) ? item.props.children : item))
             .join('')}
         </span>
