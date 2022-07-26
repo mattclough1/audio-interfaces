@@ -9,11 +9,11 @@ export const SpeechRecognitionContext = createContext({
 });
 
 export const SpeechRecognitionProvider = ({ children }) => {
-  const { recognition, setTranscript, transcript, grammarList } = useSpeechRecognition();
+  const { recognition, setTranscript, start, transcript, grammarList } = useSpeechRecognition();
 
   return (
     <SpeechRecognitionContext.Provider
-      value={{ recognition, setTranscript, transcript, grammarList }}
+      value={{ recognition, setTranscript, start, transcript, grammarList }}
     >
       {children}
     </SpeechRecognitionContext.Provider>

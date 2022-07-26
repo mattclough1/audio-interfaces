@@ -20,7 +20,7 @@ export const MockVoiceInput = () => {
         timer = setTimeout(() => {
           setTranscript(target.value);
           target.value = '';
-        }, 500);
+        }, 300);
       }}
     />
   );

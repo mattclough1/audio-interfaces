@@ -1,4 +1,4 @@
-import { createContext, useCallback, useRef, useState } from 'react';
+import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 
 // Setting Speech API values for webkit
 let { SpeechRecognition, SpeechGrammarList } = window;
@@ -14,29 +14,37 @@ export const useSpeechRecognition = ({ continuous = true } = {}) => {
   const grammarList = new SpeechGrammarList();
   // Create a new SpeechRecognition context
   const recognition = useRef(new SpeechRecognition());
-  // Set our transcript in the state
-  recognition.current.interimResults = true;
-  recognition.current.addEventListener('result', (e) => {
-    setTranscript(e.results[0][0].transcript);
-  });
+
+  useEffect(() => {
+    // Set our transcript in the state
+    recognition.current.continuous = true;
+    recognition.current.interimResults = true;
+    recognition.current.addEventListener('result', (e) => {
+      setTranscript(
+        Array.from(e.results)
+          .map((result) => result[0].transcript)
+          .join(' '),
+      );
+    });
+  }, []);
 
   const handleEnd = useCallback(() => {
     recognition.current.start();
   }, []);
 
-  const start = () => {
+  const start = useCallback(() => {
     if (continuous) {
       recognition.current.addEventListener('end', handleEnd);
     }
     recognition.current.start();
-  };
+  }, []);
 
-  const stop = () => {
+  const stop = useCallback(() => {
     if (continuous) {
       recognition.current.removeEventListener('end', handleEnd);
     }
     recognition.current.stop();
-  };
+  }, []);
 
   return { grammarList, setTranscript, start, stop, transcript };
 };

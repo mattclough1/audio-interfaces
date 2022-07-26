@@ -1,17 +1,18 @@
 :root {
   --color-1: #000000;
   --color-2: #ffffff;
+  --standard-transition: 200ms;
 }
 
 .prompter {
   display: block;
-  padding: 3rem;
 
   font-size: 3rem;
   font-weight: 600;
   line-height: 1.35;
 
   background-color: var(--color-2);
+  transition: background-color var(--standard-transition);
 }
 
 @media (min-width: 800px) {
@@ -20,23 +21,34 @@
   }
 }
 
+.prompter__controls {
+  display: flex;
+  gap: 1rem;
+  box-shadow: 0 0.1rem 0.25rem rgba(0,0,0,0.1);
+  padding: 3rem;
+  background-color: var(--color-2);
+}
+
 
 .prompter__control-wrapper {
-  top: 3rem;
+  top: 0rem;
   position: sticky;
+  z-index: 1;
 }
 
 .prompter__script {
-  margin-top: 2rem;
+  padding: 3rem;
 }
 
 .prompter__unread-script {
   color: var(--color-1);
   opacity: 0.3;
+  transition: color var(--standard-transition);
 }
 
 .prompter__read-script {
   color: var(--color-1);
+  transition: color var(--standard-transition);
 }
 
 .prompter__button {
@@ -48,4 +60,5 @@
 
   background-color: var(--color-1);
   border: 0;
+  transition: color var(--standard-transition), background-color var(--standard-transition);
 }
