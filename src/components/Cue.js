@@ -2,7 +2,6 @@ import { func, node } from 'prop-types';
 import React from 'react';
 
 export const Cue = ({ children, callback }) => {
-  console.log(callback);
   callback();
   return <span>{children}</span>;
 };
