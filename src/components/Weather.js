@@ -8,7 +8,9 @@ export const Weather = () => {
   useEffect(() => {
     async function getLondonWeather() {
       try {
-        const data = await (await fetch('http://localhost:3001/api/weather/0.1276,51.5072')).json();
+        const data = await (
+          await fetch('https://www.mattclough.com/api/weather/0.1276,51.5072')
+        ).json();
         if (data.currently) {
           setWeather(data);
         }
