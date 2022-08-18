@@ -147,11 +147,12 @@ export const Prompter = ({ children, linkShowing }) => {
   const handleLinkClick = () => {
     const top = screen.height / 24;
     const left = screen.width - screen.width / 36 - 300;
-    window.open(
+    const handle = window.open(
       '/companion',
       '_blank',
       `toolbar=no, titlebar=no, directories=no, status=no, menubar=no, scrollbars=no, width=300, height=300, top=${top}, left=${left}`,
     );
+    handle.blur();
   };
 
   return (
