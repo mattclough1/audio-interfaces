@@ -22,7 +22,7 @@ export const useSpeechRecognition = ({ continuous = true } = {}) => {
     recognition.current.addEventListener('result', (e) => {
       setTranscript(
         Array.from(e.results)
-          .map((result) => result[0].transcript)
+          .map((result) => result[0].transcript.trim())
           .join(' '),
       );
     });

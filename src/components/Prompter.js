@@ -30,6 +30,7 @@ export const Prompter = ({ children, linkShowing }) => {
 
   // Current read cursor, starting at 0 obviously
   const [cursor, setCursor] = useState(0);
+  const transcriptIndex = useRef(0);
 
   const [listening, setListening] = useState(false);
 
@@ -95,29 +96,28 @@ export const Prompter = ({ children, linkShowing }) => {
   // Whenever the speech transcript updates, let's analyze it and see if we hit any words in the script
   useEffect(() => {
     if (transcript) {
-      transcript
-        // .match(/[\w.!?,;'":]+(\s|$)/g)
-        .split(' ')
-        .slice(cursor)
-        .forEach((spokenWord) => {
-          // Get the word in the script at our current cursor point
-          let scriptWord = script[cursor];
+      const transcriptWords = transcript.split(' ');
+      for (
+        let wordIndex = transcriptIndex.current;
+        wordIndex < transcriptWords.length;
+        wordIndex += 1
+      ) {
+        const spokenWord = transcriptWords.at(wordIndex);
+        let scriptWord = script[cursor];
 
-          if (scriptWord) {
-            // If the word in the script is in a Cue, set the scriptWord to the Cue's children
-            if (React.isValidElement(scriptWord)) {
-              scriptWord = removePunc(scriptWord.props.children);
-            }
-
-            // If the spoken word matches our script word, remove the word from our speech transcript and move the cursor
-            // which will cause useEffect to run again and analyze the next word
-            // I'm 90% sure this can be done in an easier way
-            if (spokenWord.toLowerCase() === removePunc(scriptWord.toLowerCase().trim())) {
-              setTranscript((oldTranscript) => oldTranscript.split(' ').slice(1).join(' '));
-              setCursor((currentCursor) => currentCursor + 1);
-            }
+        if (scriptWord) {
+          // If the word in the script is in a Cue, set the scriptWord to the Cue's children
+          if (React.isValidElement(scriptWord)) {
+            scriptWord = removePunc(scriptWord.props.children);
           }
-        });
+
+          if (spokenWord.toLowerCase() === removePunc(scriptWord.toLowerCase().trim())) {
+            transcriptIndex.current = wordIndex + 1;
+            setCursor((currentCursor) => currentCursor + 1);
+            break;
+          }
+        }
+      }
     }
   }, [cursor, script, setTranscript, transcript]);
 
