@@ -32,7 +32,7 @@ export const Weather = () => {
   ) : hasError ? (
     'Okay, something went wrong 😅'
   ) : (
-    <div>
+    <div className="speech-demo__companion--weather">
       It&apos;s {(((weather.currently.temperature - 32) * 5) / 9).toFixed(0)}&deg; and{' '}
       {weather.currently.summary.toLowerCase()} in London.
     </div>
