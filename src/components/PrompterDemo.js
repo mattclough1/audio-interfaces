@@ -17,19 +17,17 @@ export const PrompterDemo = () => {
   return (
     <SpeechRecognitionProvider>
       <Prompter linkShowing={linkShowing}>
-        Hi team! Thanks for letting me demo this for you. As I mentioned, this little app allows you
-        to read text, and add scripted actions to any word in the text. For example, we can change
-        the <Cue callback={() => changeColor('#fbeaeb', '#2f3c7e')}>color</Cue> to make it look a
-        little more interesting. But it&apos;s not limited to color changes. After you read{' '}
-        <Cue callback={() => setLinkShowing(true)}>this</Cue>, a link will appear at the top of the
-        screen. Click the link and keep reading while watching for changes in the new window. Using
-        a <Cue callback={() => broadcastChannel.current.postMessage('📡')}>broadcast</Cue> channel,
-        we&apos;re now sending{' '}
-        <Cue callback={() => broadcastChannel.current.postMessage('💌')}>messages</Cue> to the other
-        window using our voice. We can look up the weather in{' '}
-        <Cue callback={() => broadcastChannel.current.postMessage('weather')}>London</Cue>, show a
-        funny <Cue callback={() => broadcastChannel.current.postMessage('gif')}>picture</Cue>, or do
-        anything that code can do!
+        In the summer of 1977, a fire swept across the wilderness of interior Alaska, west of
+        Denali, which was then still officially known as Mount McKinley. Tundra burned to rock;
+        345,000 acres of forest—more than 530 square miles—disappeared in flames. When the smoke
+        cleared, it left behind a weird scar on the map, a vast, charred crater littered with
+        deadfall. In the winter, when temperatures in the interior dive to forty below, the
+        skeletons of burned trees snapped in the cold or were ripped out by powerful winds. Tussocks
+        of tundra grass froze as hard as bowling balls. Every year in early March, the Iditarod
+        Trail Sled Dog Race sets out from Anchorage, in the south-central part of the state, and
+        runs northwest toward the finish line in Nome, on the coast of the Bering Sea. In its early
+        stages, the trail runs uphill, into the mountains of the Alaska Range, then plunges down,
+        into the interior, where it enters the fire’s scorched country.
       </Prompter>
       {/* <MockVoiceInput /> */}
     </SpeechRecognitionProvider>

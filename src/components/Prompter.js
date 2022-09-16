@@ -22,6 +22,9 @@ const removeSpacesBetweenPunc = (words) =>
 
 const SPLIT_REGEX = /(\s)?[\w.!?,'"]+(\s|$)/g;
 
+const getRhymingWords = async (word) =>
+  (await fetch(`https://api.datamuse.com/words?rel_rhy=${word}`)).json();
+
 export const Prompter = ({ children, linkShowing }) => {
   const { setTranscript, start, stop, transcript, grammarList } = useSpeechRecognition();
   // Comment the above line and uncomment the below line for mocking voice input
@@ -116,17 +119,18 @@ export const Prompter = ({ children, linkShowing }) => {
             setCursor((currentCursor) => currentCursor + 1);
             break;
           }
+          // } else {
+          //   getRhymingWords(removePunc(scriptWord.toLowerCase().trim())).then((words) => {
+          //     if (words.find(({ word }) => word === spokenWord.toLowerCase())) {
+          //       transcriptIndex.current = wordIndex + 1;
+          //       setCursor((currentCursor) => currentCursor + 1);
+          //     }
+          //   });
+          // }
         }
       }
     }
   }, [cursor, script, setTranscript, transcript]);
-
-  // Add spaces to our script array so we can keep our Cues but also render spaces between words
-  // const renderedScript = useMemo(
-  //   () => script,
-  //   // () => removeSpacesBetweenPunc(script.map((item, ix) => (ix !== 0 ? [' ', item] : item)).flat()),
-  //   [script],
-  // );
 
   // Scroll the cursor point to the middle of the window as we progress
   const readElement = useRef(null);
